@@ -354,6 +354,8 @@ __forceinline__ __device__ void
 timeout_check(int **task_fifo_ptrs, int head, int rank, int expected, int tag = 0) {
     auto start_time = clock64();
     while (not_finished<kNumRanks>(task_fifo_ptrs[rank] + head, expected)) {
+        // Change 3: Add threadfence_system
+        __threadfence_system();
         if (clock64() - start_time > NUM_TIMEOUT_CYCLES and threadIdx.x == 0) {
             printf("DeepEP timeout check failed: %d (rank = %d)\n", tag, rank);
             trap();
@@ -364,15 +366,17 @@ timeout_check(int **task_fifo_ptrs, int head, int rank, int expected, int tag = 
 template <int kNumRanks>
 __forceinline__ __device__ void
 barrier_device(int **task_fifo_ptrs, int head, int rank, int tag = 0) {
+    // printf("DeepEP barrier_device started: %d (rank = %d)\n", tag, rank);
     auto thread_id = static_cast<int>(threadIdx.x);
     EP_DEVICE_ASSERT(kNumRanks <= 32);
 
     if (thread_id < kNumRanks) {
         atomicAdd_system(task_fifo_ptrs[rank] + head + thread_id, FINISHED_SUM_TAG);
-        memory_fence();
+        // Key component: Change the weak memory_fence() to threadfence_system()
+        __threadfence_system();
         atomicSub_system(task_fifo_ptrs[thread_id] + head + rank, FINISHED_SUM_TAG);
     }
     timeout_check<kNumRanks>(task_fifo_ptrs, head, rank, 0, tag);
 }
-
+    // printf("DeepEP barrier_device ended: %d (rank = %d)\n", tag, rank);
 } // namespace deep_ep

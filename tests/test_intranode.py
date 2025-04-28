@@ -3,6 +3,10 @@ import time
 import torch
 import torch.distributed as dist
 
+# Add the repo to path
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # noinspection PyUnresolvedReferences
 import deep_ep
 from utils import init_dist, bench, calc_diff, inplace_unique, per_token_cast_to_fp8, per_token_cast_back
@@ -90,8 +94,11 @@ def test_main(num_sms: int, local_rank: int, num_ranks: int, rank: int, buffer: 
                         dispatch_args.update({'topk_idx': topk_idx, 'topk_weights': topk_weights_pure_rand if current_x is x_pure_rand else topk_weights})
                     if previous_mode:
                         dispatch_args.update({'previous_event': buffer.capture()})
+                    # print(rank, "Before dispatch 1", flush=True)
                     recv_x, recv_topk_idx, recv_topk_weights, recv_num_tokens_per_expert_list, handle, event = buffer.dispatch(**dispatch_args)
+                    # print(rank, "After dispatch 1", flush=True)
                     event.current_stream_wait() if async_mode else ()
+                    # print(rank, "After stream wait 1", flush=True)
                     recv_x = per_token_cast_back(*recv_x) if isinstance(recv_x, tuple) else recv_x
 
                     # Checks
@@ -117,8 +124,11 @@ def test_main(num_sms: int, local_rank: int, num_ranks: int, rank: int, buffer: 
                         dispatch_args = {'x': current_x, 'handle': handle, 'config': config, 'async_finish': async_mode}
                         if previous_mode:
                             dispatch_args.update({'previous_event': buffer.capture()})
+                        # print(rank, "Before dispatch 2", flush=True)
                         recv_x, _, _, _, _, event = buffer.dispatch(**dispatch_args)
+                        # print(rank, "After dispatch 2", flush=True)    
                         event.current_stream_wait() if async_mode else ()
+                        # print(rank, "After stream wait 2", flush=True)    
                         recv_x = per_token_cast_back(*recv_x) if isinstance(recv_x, tuple) else recv_x
                         if current_x is not x_pure_rand:
                             check_data(recv_x, rank_prefix_matrix)
@@ -129,8 +139,11 @@ def test_main(num_sms: int, local_rank: int, num_ranks: int, rank: int, buffer: 
                         combine_args.update({'topk_weights': recv_topk_weights})
                     if previous_mode:
                         dispatch_args.update({'previous_event': buffer.capture()})
+                    # print(rank, "Before combine 1", flush=True)
                     combined_x, combined_topk_weights, event = buffer.combine(**combine_args)
+                    # print(rank, "After combine 1", flush=True)
                     event.current_stream_wait() if async_mode else ()
+                    # print(rank, "After stream wait 3", flush=True)
                     check_x = combined_x.float() / is_token_in_rank.sum(dim=1).unsqueeze(1)
                     ref_x = x_pure_rand if current_x is x_pure_rand else x
                     assert calc_diff(check_x, ref_x) < 5e-6
@@ -138,15 +151,17 @@ def test_main(num_sms: int, local_rank: int, num_ranks: int, rank: int, buffer: 
                         check_topk_weights = combined_topk_weights if (current_x is x_pure_rand) else (combined_topk_weights / is_token_in_rank.sum(dim=1).unsqueeze(1))
                         ref_topk_weights = topk_weights_pure_rand if current_x is x_pure_rand else topk_weights
                         assert calc_diff(check_topk_weights, ref_topk_weights) < 1e-9
-
+                    # print(rank, 'hello??', flush=True)
                     # For later tuning
                     dispatch_bf16_nvl_recv_bytes = recv_x.numel() * 2
                     combine_bf16_nvl_send_bytes = dispatch_bf16_nvl_recv_bytes
 
-                    if local_rank == 0:
-                        print(' passed', flush=True)
+                    # if local_rank == 0:
+                    #     print(rank, ' passed', flush=True)
     if local_rank == 0:
         print()
+    
+    # print("Tuning!")
 
     # Tune dispatch performance
     best_dispatch_results = None
@@ -207,7 +222,8 @@ def test_loop(local_rank: int, num_local_ranks: int):
                             num_qps_per_rank=(ll_num_experts // num_ranks if test_ll_compatibility else 1))
     torch.manual_seed(rank)
 
-    for i in (24, ):
+    for i in (8, 16, 24, 32, 48, 64, 80, 96):
+        print("NUMBER OF SMs: ", i)
         test_main(i, local_rank, num_ranks, rank, buffer, group)
         if local_rank == 0:
             print()
@@ -219,5 +235,5 @@ def test_loop(local_rank: int, num_local_ranks: int):
 
 
 if __name__ == '__main__':
-    num_processes = 8
+    num_processes = 2
     torch.multiprocessing.spawn(test_loop, args=(num_processes, ), nprocs=num_processes)

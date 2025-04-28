@@ -118,6 +118,8 @@ void notify_dispatch(const int* num_tokens_per_rank, int* moe_recv_counter_mappe
                      int* rank_prefix_matrix_copy, int num_memset_int, int expert_alignment,
                      void** buffer_ptrs, int **task_fifo_ptrs, int head, int rank,
                      cudaStream_t stream, int num_channels) {
+
+// printf("notify dispatch started %d\n", rank); 
 #define NOTIFY_DISPATCH_LAUNCH_CASE(ranks) \
     LAUNCH_KERNEL(&cfg, notify_dispatch<ranks>, \
         num_tokens_per_rank, moe_recv_counter_mapped, \
@@ -134,6 +136,7 @@ void notify_dispatch(const int* num_tokens_per_rank, int* moe_recv_counter_mappe
     SETUP_LAUNCH_CONFIG(1 + num_ranks, kNumThreads, stream);
     SWITCH_RANKS(NOTIFY_DISPATCH_LAUNCH_CASE);
 #undef NOTIFY_DISPATCH_LAUNCH_CASE
+// printf("notify dispatch ended %d\n", rank);
 }
 
 template<int kNumRanks>
@@ -164,6 +167,7 @@ cached_notify_dispatch(const int* rank_prefix_matrix, int num_memset_int,
 void cached_notify_dispatch(const int* rank_prefix_matrix, int num_memset_int,
                             void** buffer_ptrs, int** task_fifo_ptrs,
                             int head, int rank, int num_ranks, cudaStream_t stream) {
+// printf("cached notify combine started %d\n", rank);
 #define CACHED_NOTIFY_DISPATCH_LAUNCH_CASE(ranks) \
     LAUNCH_KERNEL(&cfg, cached_notify_dispatch<ranks>, \
         rank_prefix_matrix, num_memset_int, buffer_ptrs, task_fifo_ptrs, head, rank); \
@@ -172,6 +176,7 @@ void cached_notify_dispatch(const int* rank_prefix_matrix, int num_memset_int,
     SETUP_LAUNCH_CONFIG(1, 128, stream);
     SWITCH_RANKS(CACHED_NOTIFY_DISPATCH_LAUNCH_CASE);
 #undef CACHED_NOTIFY_DISPATCH_LAUNCH_CASE
+// printf("cached notify combine ended %d\n", rank);
 }
 
 template <int kNumRanks, int kNumThreads>
@@ -443,6 +448,7 @@ void dispatch(void* recv_x, float* recv_x_scales, int* recv_src_idx, int64_t* re
               cudaStream_t stream, int num_sms, int num_max_send_tokens, int num_recv_buffer_tokens) {
     constexpr int kNumThreads = 512;
 
+// printf("dispatch started %d\n", rank);
 #define DISPATCH_LAUNCH_CASE(ranks) \
 LAUNCH_KERNEL(&cfg, dispatch<ranks, kNumThreads>, \
     reinterpret_cast<int4*>(recv_x), recv_x_scales, recv_src_idx, recv_topk_idx, recv_topk_weights, recv_channel_offset, \
@@ -452,6 +458,7 @@ LAUNCH_KERNEL(&cfg, dispatch<ranks, kNumThreads>, \
     buffer_ptrs, rank, \
     num_max_send_tokens, num_recv_buffer_tokens); \
 break
+// printf("dispatch ended %d\n", rank);
 
     // Even-numbered blocks for sending, odd-numbered blocks for receiving.
     EP_HOST_ASSERT(num_sms % 2 == 0);
@@ -499,17 +506,20 @@ cached_notify_combine(void** buffer_ptrs, int* send_head, int num_channels, int 
         for (int token_idx_tail = token_end_idx - 1; token_idx_tail >= token_start_idx; token_idx_tail -= 32) {
             int token_idx = token_idx_tail - lane_id, expected_head = 0;
             auto current_head = (token_idx >= token_start_idx) ? __ldg(send_head + token_idx * kNumRanks + rank_id) : -1;
+            int shuffled_head; // New local variable for variable shuffling
             for (int i = 0; i < min(32, token_idx_tail - token_start_idx + 1); ++ i) {
-                head = __shfl_sync(0xffffffff, current_head, i);
-                if (head < 0) {
+                shuffled_head = __shfl_sync(0xffffffff, current_head, i);
+                if (shuffled_head < 0) {
                     if (lane_id == i)
                         expected_head = -last_head - 1;
                 } else {
-                    last_head = head;
+                    last_head = shuffled_head;
                 }
             }
             if (current_head < 0 and token_idx >= token_start_idx)
-                send_head[token_idx * kNumRanks + rank_id] = expected_head;
+                // send_head[token_idx * kNumRanks + rank_id] = expected_head;
+                // Change: Atomic exchange
+                atomicExch(send_head + token_idx * kNumRanks + rank_id, expected_head);
         }
     }
 }
@@ -518,6 +528,8 @@ void cached_notify_combine(void** buffer_ptrs, int* send_head, int num_channels,
                            int num_recv_tokens, int num_memset_int,
                            int** task_fifo_ptrs, int head, int rank, int num_ranks,
                            cudaStream_t stream) {
+
+// printf("cached notify combine started %d\n", rank);
 #define CACHED_NOTIFY_COMBINE(ranks) \
     LAUNCH_KERNEL(&cfg, cached_notify_combine<ranks>, \
         buffer_ptrs, send_head, num_channels, num_recv_tokens, num_memset_int, task_fifo_ptrs, head, rank); \
@@ -530,6 +542,7 @@ void cached_notify_combine(void** buffer_ptrs, int* send_head, int num_channels,
     SETUP_LAUNCH_CONFIG(1 + num_channels, num_threads, stream);
     SWITCH_RANKS(CACHED_NOTIFY_COMBINE);
 #undef CACHED_NOTIFY_COMBINE
+// printf("cached notify combine ended %d\n", rank);
 }
 
 template<typename dtype_t, int kNumRanks, int kNumThreads>
@@ -800,6 +813,7 @@ void combine(cudaDataType_t type,
              int num_max_send_tokens, int num_recv_buffer_tokens) {
     constexpr int kNumThreads = 768;
 
+// printf("combine started %d\n", rank);
 #define COMBINE_LAUNCH_CASE(dtype, ranks) \
     LAUNCH_KERNEL(&cfg, (combine<dtype, ranks, kNumThreads>), \
         reinterpret_cast<dtype*>(recv_x), recv_topk_weights, \
@@ -810,6 +824,7 @@ void combine(cudaDataType_t type,
         num_max_send_tokens, num_recv_buffer_tokens); \
     break
 #define COMBINE_DTYPE_LAUNCH_CASE(dtype) SWITCH_RANKS_WITH_DTYPE(dtype, COMBINE_LAUNCH_CASE); break
+// printf("combine ended %d\n", rank);
 
     // Even-numbered blocks for sending, odd-numbered blocks for receiving
     EP_HOST_ASSERT(num_sms % 2 == 0);

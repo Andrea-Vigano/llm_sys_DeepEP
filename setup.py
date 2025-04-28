@@ -10,18 +10,18 @@ if __name__ == '__main__':
     print(f'NVSHMEM directory: {nvshmem_dir}')
 
     # TODO: currently, we only support Hopper architecture, we may add Ampere support later
-    os.environ['TORCH_CUDA_ARCH_LIST'] = '9.0'
+    os.environ['TORCH_CUDA_ARCH_LIST'] = '8.0;9.0'
     cxx_flags = ['-O3', '-Wno-deprecated-declarations', '-Wno-unused-variable',
                  '-Wno-sign-compare', '-Wno-reorder', '-Wno-attributes']
     nvcc_flags = ['-O3', '-Xcompiler', '-O3', '-rdc=true', '--ptxas-options=--register-usage-level=10']
     include_dirs = ['csrc/', f'{nvshmem_dir}/include']
     sources = ['csrc/deep_ep.cpp',
                'csrc/kernels/runtime.cu', 'csrc/kernels/intranode.cu',
-               'csrc/kernels/internode.cu', 'csrc/kernels/internode_ll.cu']
+               'csrc/kernels/internode.cu'] #, 'csrc/kernels/internode_ll.cu'
     library_dirs = [f'{nvshmem_dir}/lib']
 
     # Disable aggressive PTX instructions
-    if int(os.getenv('DISABLE_AGGRESSIVE_PTX_INSTRS', '0')):
+    if int(os.getenv('DISABLE_AGGRESSIVE_PTX_INSTRS', '1')):
         cxx_flags.append('-DDISABLE_AGGRESSIVE_PTX_INSTRS')
         nvcc_flags.append('-DDISABLE_AGGRESSIVE_PTX_INSTRS')
 

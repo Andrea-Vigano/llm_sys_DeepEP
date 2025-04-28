@@ -1,0 +1,132 @@
+[config] num_tokens=4096, hidden=7168, num_topk=8
+[layout] Kernel performance: 0.036 ms
+
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, with top-k (async=False, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, without top-k (async=False, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, with top-k (async=True, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, without top-k (async=True, previous=False) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, with top-k (async=False, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, without top-k (async=False, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, with top-k (async=True, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+[testing] Running with FP8, without top-k (async=True, previous=True) ...
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+ passed
+
+[tuning] SMs 24, NVL chunk 4: 124.24 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8: 173.31 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12: 193.26 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16: 211.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20: 213.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24: 224.01 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28: 221.22 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32: 232.91 GB/s (NVL) 
+[tuning] Best dispatch (FP8): SMs 24, NVL chunk 32, 232.91 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 4: 190.75 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8: 270.93 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12: 279.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16: 308.71 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20: 295.40 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24: 315.22 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28: 301.68 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32: 317.05 GB/s (NVL) 
+[tuning] Best dispatch (BF16): SMs 24, NVL chunk 32, 317.05 GB/s (NVL)
+
+[0] Dispatching tensor([4083, 4083], device='cuda:0', dtype=torch.int32) tokens to 2 ranks
+[tuning] SMs 24, NVL chunk 1: 51.31 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2: 98.97 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3: 142.94 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4: 181.80 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5: 214.26 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6: 246.59 GB/s (NVL) 
+[tuning] Best combine: SMs 24, NVL chunk 6: 246.59 GB/s (NVL)
+
+
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[1] Dispatching tensor([4079, 4086], device='cuda:1', dtype=torch.int32) tokens to 2 ranks
+[rank0]:[W420 20:36:59.402538718 ProcessGroupNCCL.cpp:1496] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

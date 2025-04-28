@@ -3,6 +3,9 @@ import time
 import torch
 import torch.distributed as dist
 
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # noinspection PyUnresolvedReferences
 import deep_ep
 from utils import init_dist, bench, calc_diff, create_grouped_scores, inplace_unique, per_token_cast_to_fp8, per_token_cast_back

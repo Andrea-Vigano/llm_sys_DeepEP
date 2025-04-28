@@ -1,0 +1,34 @@
+[config] num_tokens=4096, hidden=7168, num_topk=8
+[layout] Kernel performance: 0.056 ms
+
+[testing] Running with BF16, without top-k (async=False, previous=False) ...[testing] Running with BF16, with top-k (async=False, previous=False) ...[testing] Running with BF16, without top-k (async=False, previous=False) ...[testing] Running with BF16, with top-k (async=False, previous=False) ...[testing] Running with FP8, without top-k (async=False, previous=False) ...[testing] Running with FP8, with top-k (async=False, previous=False) ...[testing] Running with BF16, without top-k (async=True, previous=False) ...[testing] Running with BF16, with top-k (async=True, previous=False) ...[testing] Running with BF16, without top-k (async=True, previous=False) ...[testing] Running with BF16, with top-k (async=True, previous=False) ...[testing] Running with FP8, without top-k (async=True, previous=False) ...[testing] Running with FP8, with top-k (async=True, previous=False) ...[testing] Running with BF16, without top-k (async=False, previous=True) ...[testing] Running with BF16, with top-k (async=False, previous=True) ...[testing] Running with BF16, without top-k (async=False, previous=True) ...[testing] Running with BF16, with top-k (async=False, previous=True) ...[testing] Running with FP8, without top-k (async=False, previous=True) ...[testing] Running with FP8, with top-k (async=False, previous=True) ...[testing] Running with BF16, without top-k (async=True, previous=True) ...[testing] Running with BF16, with top-k (async=True, previous=True) ...[testing] Running with BF16, without top-k (async=True, previous=True) ...[testing] Running with BF16, with top-k (async=True, previous=True) ...[testing] Running with FP8, without top-k (async=True, previous=True) ...[testing] Running with FP8, with top-k (async=True, previous=True) ...
+[tuning] SMs 24, NVL chunk 4: 67.34 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8: 117.29 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12: 133.11 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16: 142.87 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20: 147.94 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24: 153.76 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28: 153.03 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32: 158.82 GB/s (NVL) 
+[tuning] Best dispatch (FP8): SMs 24, NVL chunk 32, 158.82 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 4: 126.80 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8: 185.35 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12: 198.28 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16: 215.05 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20: 214.22 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24: 222.88 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28: 217.75 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32: 223.36 GB/s (NVL) 
+[tuning] Best dispatch (BF16): SMs 24, NVL chunk 32, 223.36 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 1: 32.18 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2: 62.01 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3: 89.40 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4: 115.32 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5: 137.59 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6: 152.63 GB/s (NVL) 
+[tuning] Best combine: SMs 24, NVL chunk 6: 152.63 GB/s (NVL)
+
+
+[rank0]:[W420 15:01:40.454866734 ProcessGroupNCCL.cpp:1250] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())
